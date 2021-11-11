@@ -18,12 +18,10 @@
 </template>
 
 <script>
-import { latLng } from 'leaflet'
+import { latLng, Icon } from 'leaflet'
 import { LMap, LTileLayer } from 'vue2-leaflet'
 import msgMixin from '../mixins/msg-mixin'
 import '@geoman-io/leaflet-geoman-free'
-import 'leaflet/dist/leaflet.css'
-import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
 
 export default {
   name: 'AppMap',
@@ -37,7 +35,8 @@ export default {
       zoom: 14,
       center: latLng(10.48801, -66.87919),
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      attribution:
+        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }
   },
   methods: {
@@ -47,8 +46,23 @@ export default {
         position: 'topleft',
         drawCircle: false
       })
-      this.map.on('pm:create', ({shape, layer}) => {
+      this.map.on('pm:create', ({ shape, layer }) => {
         this.successMsg(`Created ${shape} with ${layer._latlngs}`)
+      })
+
+      /**
+       *
+       * Fix for marker icons are missing
+       *
+       * https://vue2-leaflet.netlify.app/quickstart/#marker-icons-are-missing
+       *
+       */
+      delete Icon.Default.prototype._getIconUrl
+
+      Icon.Default.mergeOptions({
+        iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+        iconUrl: require('leaflet/dist/images/marker-icon.png'),
+        shadowUrl: require('leaflet/dist/images/marker-shadow.png')
       })
     }
   }
@@ -56,6 +70,9 @@ export default {
 </script>
 
 <style scoped>
+@import '~leaflet/dist/leaflet.css';
+@import '~@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
+
 .app-map {
   height: 600px;
 }
